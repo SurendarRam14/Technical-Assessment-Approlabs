@@ -124,11 +124,40 @@ router.post('/login', loginUser);
  * @swagger
  * /auth/refresh-token:
  *   post:
- *     tags: [Auth]
- *     summary: Refresh JWT token
+ *     tags:
+ *       - Auth
+ *     summary: Refresh access token using refresh token
+ *     description: Generates a new access token when a valid refresh token is provided.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: Valid refresh token
+ *                 example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *     responses:
  *       200:
- *         description: Token refreshed successfully
+ *         description: Access token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       400:
+ *         description: Refresh token is missing
+ *       403:
+ *         description: Invalid refresh token
+ *       500:
+ *         description: Internal server error
  */
 router.post('/refresh-token', refreshToken);
 

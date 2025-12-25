@@ -14,7 +14,7 @@ export const inviteUser = async (
   invitedById: number
 ) => {
   const token = crypto.randomBytes(32).toString('hex');
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h
+  const expiresAt = new Date(Date.now() + Number(process.env.INVITATION_TOKEN_EXPIRES_IN) * 60 * 60 * 1000); // 24h
 
   return organizationRepo.createInvitation({
     email,
