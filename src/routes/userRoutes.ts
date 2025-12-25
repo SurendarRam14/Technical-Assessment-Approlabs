@@ -10,28 +10,42 @@ router.use(authenticateJWT);
 
 /**
  * @swagger
- * tags:
- *   name: Users
- *   description: User management routes (Admin only)
- */
-
-/**
- * @swagger
  * /users:
  *   get:
  *     tags: [Users]
  *     summary: Get all users (Admin only)
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: ID of the last user from previous page for cursor-based pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         required: false
+ *         description: Number of users to return per page
  *     responses:
  *       200:
- *         description: List of users
+ *         description: List of users with pagination info
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *                 nextCursor:
+ *                   type: integer
+ *                   nullable: true
+ *                   description: ID for the next page cursor (null if no more records)
  *       401:
  *         description: Unauthorized
  *       403:

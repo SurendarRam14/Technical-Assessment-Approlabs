@@ -1,8 +1,7 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from './authMiddleware';
-import { Role } from '@prisma/client'; // if you use the Role enum from Prisma
+import { Role } from '@prisma/client';
 
-// Role-based access control middleware
 export const authorizeRoles = (...allowedRoles: Role[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {

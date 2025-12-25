@@ -1,4 +1,4 @@
-import prisma from '../config/db';
+import prisma from '../config/prisma';
 import { Task, TaskPriority, TaskStatus } from '@prisma/client';
 
 interface GetTasksResult {
@@ -6,7 +6,6 @@ interface GetTasksResult {
   nextCursor: number | null;
 }
 
-// ---------------- Create Task ----------------
 export const createTask = async (
   title: string,
   description: string | null,
@@ -33,7 +32,6 @@ export const createTask = async (
   });
 };
 
-// ---------------- Assign Task ----------------
 export const assignTask = async (
   taskId: number,
   userId: number,
@@ -55,7 +53,6 @@ export const assignTask = async (
   });
 };
 
-// ---------------- Update Task Status ----------------
 export const updateTaskStatus = async (
   taskId: number,
   userId: number,
@@ -84,7 +81,6 @@ export const updateTaskStatus = async (
   });
 };
 
-// ---------------- Get Tasks with Pagination & Filtering ----------------
 export const getTasks = async (
   organizationId: number,
   cursor?: number,
@@ -113,7 +109,6 @@ export const getTasks = async (
   return { tasks, nextCursor };
 };
 
-// ---------------- Get Task by ID ----------------
 export const getTaskById = async (taskId: number, organizationId: number): Promise<Task> => {
   const task = await prisma.task.findFirst({
     where: { id: taskId, project: { organizationId }, isDeleted: false },

@@ -72,11 +72,85 @@ router.post('/', authorizeRoles(Role.MANAGER), createTask);
  *   get:
  *     tags: [Tasks]
  *     summary: Get all tasks (any authenticated user)
+ *     description: Retrieve tasks with optional pagination and filtering.
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: ID of the last task from previous page for cursor-based pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         required: false
+ *         description: Number of tasks to return per page
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [TODO, IN_PROGRESS, DONE]
+ *         required: false
+ *         description: Filter tasks by status
+ *       - in: query
+ *         name: assignedTo
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: Filter tasks assigned to a specific user ID
  *     responses:
  *       200:
- *         description: List of tasks
+ *         description: List of tasks with pagination info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 tasks:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       title:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                         nullable: true
+ *                       priority:
+ *                         type: string
+ *                         enum: [LOW, MEDIUM, HIGH]
+ *                       status:
+ *                         type: string
+ *                         enum: [TODO, IN_PROGRESS, DONE]
+ *                       dueDate:
+ *                         type: string
+ *                         format: date-time
+ *                         nullable: true
+ *                       assignedTo:
+ *                         type: integer
+ *                         nullable: true
+ *                       projectId:
+ *                         type: integer
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                 nextCursor:
+ *                   type: integer
+ *                   nullable: true
+ *                   description: ID for the next page cursor (null if no more records)
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 router.get('/', getTasks);
 

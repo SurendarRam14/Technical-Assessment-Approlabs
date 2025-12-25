@@ -1,4 +1,4 @@
-import prisma from '../config/db';
+import prisma from '../config/prisma';
 import { Project, Prisma } from '@prisma/client';
 
 interface GetProjectsResult {
@@ -6,7 +6,6 @@ interface GetProjectsResult {
   nextCursor: number | null;
 }
 
-// ---------------- Create Project ----------------
 export const createProject = async (
   name: string,
   organizationId: number,
@@ -24,7 +23,6 @@ export const createProject = async (
   });
 };
 
-// ---------------- Get Projects with Pagination ----------------
 export const getProjects = async (
   organizationId: number,
   cursor?: number,
@@ -47,7 +45,6 @@ export const getProjects = async (
   return { projects, nextCursor };
 };
 
-// ---------------- Get Project by ID ----------------
 export const getProjectById = async (id: number, deleted: boolean = false): Promise<Project> => {
   const project = await prisma.project.findFirst({
     where: { id, isDeleted: deleted },
@@ -57,8 +54,6 @@ export const getProjectById = async (id: number, deleted: boolean = false): Prom
   return project;
 };
 
-
-// ---------------- Update Project ----------------
 export const updateProject = async (
   id: number,
   organizationId: number,
@@ -74,7 +69,6 @@ export const updateProject = async (
   return getProjectById(id);
 };
 
-// ---------------- Soft Delete Project ----------------
 export const softDeleteProject = async (id: number): Promise<Project> => {
   const result = await prisma.project.updateMany({
     where: { id, isDeleted: false },

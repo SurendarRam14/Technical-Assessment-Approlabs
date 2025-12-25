@@ -1,41 +1,40 @@
 import dotenv from 'dotenv';
-import app from './app';
-import { setupSwagger } from './config/swagger';
-import { PrismaClient } from '@prisma/client';
-import { exec } from 'child_process';
-
 dotenv.config();
 
+import app from './app';
+import { setupSwagger } from './config/swagger';
+import prisma from './config/prisma';
+import { ensureDatabaseExists } from './config/db-init';
+import { exec } from 'child_process';
+
 const PORT = Number(process.env.PORT) || 3000;
-const prisma = new PrismaClient();
 
 async function startServer() {
   try {
-    // Connect to database
+    // Ensure DB exists
+    await ensureDatabaseExists();
+
+    // Connect Prisma
     await prisma.$connect();
-    console.log('✅ Database connected');
+    console.log('Prisma connected');
 
-    // Automatically create tables (development only)
-    exec('npx prisma db push', (err, stdout, stderr) => {
-      if (err) {
-        console.error('❌ Error creating tables:', err);
-      } else {
-        console.log('✅ Database schema is ready');
-        if (stdout) console.log(stdout);
-        if (stderr) console.error(stderr);
-      }
-    });
+    // Sync schema (DEV ONLY)
+    if (process.env.NODE_ENV !== 'production') {
+      exec('npx prisma db push', (err) => {
+        if (err) console.error('Prisma sync failed', err);
+        else console.log('Prisma schema synced');
+      });
+    }
 
-    // Setup Swagger
+    // Swagger
     setupSwagger(app);
 
-    // Start Express server
     app.listen(PORT, () => {
-      console.log(`🚀 Server started on http://localhost:${PORT}`);
-      console.log(`📄 Swagger UI running at http://localhost:${PORT}/api-docs`);
+      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`Swagger at http://localhost:${PORT}/api-docs`);
     });
   } catch (error) {
-    console.error('❌ Server failed to start:', error);
+    console.error('Server start failed:', error);
     process.exit(1);
   }
 }

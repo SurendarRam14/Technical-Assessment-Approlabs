@@ -1,7 +1,6 @@
-import prisma from '../config/db';
+import prisma from '../config/prisma';
 import { User, Role } from '@prisma/client';
 
-// ---------------- Create User ----------------
 export const createUser = async (data: {
   email: string;
   password: string;
@@ -17,28 +16,23 @@ export const createUser = async (data: {
   });
 };
 
-// ---------------- Find User by Email ----------------
 export const findUserByEmail = async (email: string): Promise<User | null> => {
   return await prisma.user.findUnique({
     where: { email },
   });
 };
 
-// ---------------- Find User by ID ----------------
 export const findUserById = async (id: number, organizationId?: number): Promise<User | null> => {
   const where = organizationId ? { id, organizationId } : { id };
   return await prisma.user.findFirst({ where });
 };
 
-// ---------------- Get All Users ----------------
 export const getAllUsers = async (organizationId?: number): Promise<User[]> => {
   const where = organizationId ? { organizationId } : {};
   return await prisma.user.findMany({ where });
 };
 
-// ---------------- Update User Role ----------------
 export const updateUserRole = async (id: number, role: Role, organizationId?: number): Promise<User> => {
-  // Ensure user exists in the organization
   const user = await findUserById(id, organizationId);
   if (!user) throw new Error('User not found');
 

@@ -21,12 +21,6 @@ app.use(helmet());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Routes
-app.use((req, res, next) => {
-  console.log(`[REQUEST] ${req.method} ${req.path}`);
-  if (req.body) console.log('Body:', req.body);
-  next();
-});
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/projects', projectRoutes);
@@ -35,7 +29,7 @@ app.use('/organization', organizationRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-  res.send('Server is running 🚀');
+  res.send('Server is running');
 });
 
 // Global error handler

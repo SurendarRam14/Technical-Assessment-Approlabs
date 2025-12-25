@@ -65,11 +65,83 @@ router.post('/', authorizeRoles(Role.ADMIN, Role.MANAGER), createProject);
  *   get:
  *     tags: [Projects]
  *     summary: Get all projects (any authenticated user)
+ *     description: Retrieve projects with optional pagination, sorting, and filtering.
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: ID of the last project from previous page for cursor-based pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         required: false
+ *         description: Number of projects to return per page
+ *       - in: query
+ *         name: organizationId
+ *         schema:
+ *           type: integer
+ *         required: false
+ *         description: Filter projects by organization ID
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum: [createdAt, name]
+ *           default: createdAt
+ *         required: false
+ *         description: Field to sort by
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         required: false
+ *         description: Sort order
  *     responses:
  *       200:
- *         description: List of projects
+ *         description: List of projects with pagination info
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 projects:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                         nullable: true
+ *                       organizationId:
+ *                         type: integer
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                       isDeleted:
+ *                         type: boolean
+ *                 nextCursor:
+ *                   type: integer
+ *                   nullable: true
+ *                   description: ID for the next page cursor (null if no more records)
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
  */
 router.get('/', getProjects);
 

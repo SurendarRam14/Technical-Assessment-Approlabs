@@ -3,7 +3,6 @@ import { AuthRequest } from '../middlewares/authMiddleware';
 import * as projectService from '../services/projectService';
 import { Role } from '@prisma/client';
 
-// ---------------- Create Project (ADMIN / MANAGER) ----------------
 export const createProject = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
@@ -24,7 +23,6 @@ export const createProject = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ---------------- Get All Projects ----------------
 export const getProjects = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
@@ -39,7 +37,6 @@ export const getProjects = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ---------------- Get Project by ID ----------------
 export const getProjectById = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
@@ -51,7 +48,6 @@ export const getProjectById = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ---------------- Update Project (ADMIN / MANAGER) ----------------
 export const updateProject = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
@@ -71,7 +67,6 @@ export const updateProject = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ---------------- Soft Delete Project (ADMIN / MANAGER) ----------------
 export const deleteProject = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
@@ -81,7 +76,7 @@ export const deleteProject = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ message: 'Forbidden' });
 
     const project = await projectService.softDeleteProject(Number(req.params.id));
-    console.log('Soft deleted project:', project);
+
     res.json({ message: 'Project soft-deleted', project });
   } catch (err: any) {
     res.status(500).json({ message: err.message });

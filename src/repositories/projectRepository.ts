@@ -1,4 +1,4 @@
-import prisma from '../config/db';
+import prisma from '../config/prisma';
 import { Project } from '@prisma/client';
 
 interface GetProjectsResult {
@@ -6,7 +6,6 @@ interface GetProjectsResult {
   nextCursor: number | null;
 }
 
-// ---------------- Create Project ----------------
 export const createProject = async (
   name: string,
   organizationId: number,
@@ -21,7 +20,6 @@ export const createProject = async (
   });
 };
 
-// ---------------- Find Project by Name ----------------
 export const findProjectByName = async (
   name: string,
   organizationId: number
@@ -31,7 +29,6 @@ export const findProjectByName = async (
   });
 };
 
-// ---------------- Find Project by ID ----------------
 export const findProjectById = async (
   id: number,
   organizationId: number
@@ -41,7 +38,6 @@ export const findProjectById = async (
   });
 };
 
-// ---------------- Get Projects with Cursor-based Pagination ----------------
 export const getProjects = async (
   organizationId: number,
   cursor?: number,
@@ -64,7 +60,6 @@ export const getProjects = async (
   return { projects, nextCursor };
 };
 
-// ---------------- Update Project ----------------
 export const updateProject = async (
   id: number,
   organizationId: number,
@@ -83,7 +78,6 @@ export const updateProject = async (
   return project;
 };
 
-// ---------------- Soft Delete Project ----------------
 export const softDeleteProject = async (
   id: number,
   organizationId: number

@@ -1,14 +1,16 @@
 import { Request, Response } from 'express';
-import prisma from '../config/db';
+import prisma from '../config/prisma';
 import { AuthRequest } from '../middlewares/authMiddleware';
 
-// ---------------- Get all users (ADMIN only) ----------------
 export const getAllUsers = async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user;
     if (!user || !user.organizationId) {
       return res.status(401).json({ message: 'Unauthorized: User not authenticated' });
     }
+
+    const cursor = req.query.cursor ? Number(req.query.cursor) : undefined;
+    const limit = req.query.limit ? Number(req.query.limit) : 10;
 
     const users = await prisma.user.findMany({
       where: { organizationId: user.organizationId },
@@ -20,15 +22,24 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
         createdAt: true,
         updatedAt: true,
       },
+      take: limit + 1,
+      cursor: cursor ? { id: cursor } : undefined,
+      skip: cursor ? 1 : 0,
+      orderBy: { createdAt: 'desc' },
     });
 
-    res.json(users);
+    let nextCursor: number | null = null;
+    if (users.length > limit) {
+      const nextItem = users.pop();
+      nextCursor = nextItem?.id ?? null;
+    }
+
+    res.json({ users, nextCursor });
   } catch (err: any) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// ---------------- Get user by ID (ADMIN only) ----------------
 export const getUserById = async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user;
@@ -58,7 +69,6 @@ export const getUserById = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ---------------- Update user role (ADMIN only) ----------------
 export const updateUserRole = async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user;
@@ -69,7 +79,6 @@ export const updateUserRole = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { role } = req.body;
 
-    // Prevent updating role of a user outside your organization
     const targetUser = await prisma.user.findFirst({
       where: { id: Number(id), organizationId: user.organizationId },
     });

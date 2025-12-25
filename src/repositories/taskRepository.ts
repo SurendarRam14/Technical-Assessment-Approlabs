@@ -1,4 +1,4 @@
-import prisma from '../config/db';
+import prisma from '../config/prisma';
 import { Task, TaskPriority, TaskStatus } from '@prisma/client';
 
 export interface GetTasksResult {
@@ -6,7 +6,6 @@ export interface GetTasksResult {
   nextCursor: number | null;
 }
 
-// ---------------- Create Task ----------------
 export const createTask = async (data: {
   title: string;
   description?: string | null;
@@ -26,14 +25,12 @@ export const createTask = async (data: {
   });
 };
 
-// ---------------- Find Task by ID ----------------
 export const findTaskById = async (id: number): Promise<Task | null> => {
   return prisma.task.findFirst({
     where: { id, isDeleted: false },
   });
 };
 
-// ---------------- Assign Task ----------------
 export const assignTask = async (taskId: number, userId: number): Promise<Task> => {
   const task = await prisma.task.findFirst({ where: { id: taskId, isDeleted: false } });
   if (!task) throw new Error('Task not found');
@@ -44,7 +41,6 @@ export const assignTask = async (taskId: number, userId: number): Promise<Task> 
   });
 };
 
-// ---------------- Update Task Status ----------------
 export const updateTaskStatus = async (taskId: number, status: TaskStatus): Promise<Task> => {
   const task = await prisma.task.findFirst({ where: { id: taskId, isDeleted: false } });
   if (!task) throw new Error('Task not found');
@@ -55,7 +51,6 @@ export const updateTaskStatus = async (taskId: number, status: TaskStatus): Prom
   });
 };
 
-// ---------------- Get Tasks with Pagination & Filtering ----------------
 export const getTasks = async (
   cursor?: number,
   limit = 10,
@@ -83,7 +78,6 @@ export const getTasks = async (
   return { tasks, nextCursor };
 };
 
-// ---------------- Soft Delete Task ----------------
 export const softDeleteTask = async (taskId: number): Promise<Task> => {
   const task = await prisma.task.findFirst({ where: { id: taskId, isDeleted: false } });
   if (!task) throw new Error('Task not found');

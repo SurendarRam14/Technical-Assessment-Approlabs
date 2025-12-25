@@ -1,4 +1,4 @@
-import prisma from '../config/db';
+import prisma from '../config/prisma';
 import { Role } from '@prisma/client';
 
 interface CreateOrganizationInput {
@@ -14,12 +14,10 @@ interface CreateInvitationInput {
   invitedById: number;
 }
 
-// ----------------- Organization -----------------
 export const createOrganization = async (data: CreateOrganizationInput) => {
   return prisma.organization.create({ data });
 };
 
-// ----------------- Invitation -----------------
 export const createInvitation = async (data: CreateInvitationInput) => {
   return prisma.invitation.create({
     data: {

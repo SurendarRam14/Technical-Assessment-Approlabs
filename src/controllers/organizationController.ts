@@ -3,7 +3,6 @@ import * as organizationService from '../services/organizationService';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { Role } from '@prisma/client';
 
-// ---------------- Create Organization (Admin Only) ----------------
 export const createOrganization = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
@@ -19,7 +18,6 @@ export const createOrganization = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// ---------------- Invite User (Admin Only) ----------------
 export const inviteUser = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
