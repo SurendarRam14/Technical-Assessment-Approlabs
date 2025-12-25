@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id             Int          @id @default(autoincrement())
+  email          String       @unique
+  password       String
+  name           String
+  role           Role         @default(USER)
+  organizationId Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  assignedTasks  Task[]       @relation("AssignedTasks")
+  invitedTokens  Invitation[] @relation("UserInvitations")
+
+  @@index([organizationId])
+}
+
+model Project {
+  id             Int          @id @default(autoincrement())
+  name           String
+  description    String?
+  organizationId Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  isDeleted      Boolean      @default(false) // soft delete
+
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  tasks          Task[]
+
+  @@unique([name, organizationId])
+  @@index([organizationId])
+}
+
+model Task {
+  id          Int          @id @default(autoincrement())
+  title       String
+  description String?
+  priority    TaskPriority @default(LOW)
+  status      TaskStatus   @default(TODO)
+  dueDate     DateTime?
+  projectId   Int
+  assignedTo  Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  isDeleted   Boolean      @default(false)
+
+  project     Project   @relation(fields: [projectId], references: [id])
+  assignee    User?     @relation("AssignedTasks", fields: [assignedTo], references: [id])
+
+  @@index([projectId])
+  @@index([assignedTo])
+}
+
+model Organization {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  users       User[]
+  projects    Project[]
+  invitations Invitation[]
+  createdAt   DateTime     @default(now())
+}
+
+model Invitation {
+  id             Int          @id @default(autoincrement())
+  email          String
+  token          String       @unique
+  role           Role
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  invitedById    Int
+  invitedBy      User         @relation("UserInvitations", fields: [invitedById], references: [id])
+
+  expiresAt      DateTime
+  used           Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([email])
+  @@index([invitedById])
+}
+
+
